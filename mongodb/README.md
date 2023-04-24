@@ -1,18 +1,18 @@
 ## MongoDB cluster
 
 
-# 1. Create a Docker network.
+# Create a Docker network.
 
 docker network create mongoCluster
 
-# 2. Start three instances of MongoDB.
+# Start three instances of MongoDB.
 
 docker run -d --rm -p 27017:27017 --name mongo1 --network mongoCluster mongo:5 mongod --replSet myReplicaSet --bind_ip localhost,mongo1
 docker run -d --rm -p 27018:27017 --name mongo2 --network mongoCluster mongo:5 mongod --replSet myReplicaSet --bind_ip localhost,mongo2
 docker run -d --rm -p 27019:27017 --name mongo3 --network mongoCluster mongo:5 mongod --replSet myReplicaSet --bind_ip localhost,mongo3
 
 
-# 3. Initiate the Replica Set.
+# Initiate the Replica Set.
 
 docker exec -it mongo1 mongosh --eval "rs.initiate({
  _id: \"myReplicaSet\",
@@ -32,3 +32,12 @@ docker exec -it mongo1 mongosh --eval "rs.status()"
 docker stop mongo1
 docker stop mongo2
 docker stop mongo3
+
+# Add new serwer to cluster
+
+docker exec -it mongo1 mongosh --eval "rs.add('mongo2:27017')"
+
+# Remove serwer from cluster
+
+docker exec -it mongo1 mongosh --eval "rs.remove('mongo2:27017')"
+
